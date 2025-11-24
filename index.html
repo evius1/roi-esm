@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор ESM</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-title i {
+            font-size: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e8ecef;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+        
+        .form-input:focus {
+            border-color: #667eea;
+            background: white;
+            outline: none;
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e8ecef;
+            border-radius: 12px;
+            font-size: 16px;
+            background: #f8f9fa;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .result-label {
+            color: #5a6c7d;
+            font-size: 14px;
+        }
+        
+        .result-value {
+            font-weight: 600;
+            font-size: 16px;
+            color: #2c3e50;
+        }
+        
+        .positive {
+            color: #27ae60;
+        }
+        
+        .negative {
+            color: #e74c3c;
+        }
+        
+        .scenario-btn {
+            width: 100%;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+        
+        .scenario-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+        
+        .scenario-btn.secondary {
+            background: #95a5a6;
+        }
+        
+        .scenario-btn.secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        .scenario-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .share-btn {
+            width: 100%;
+            padding: 16px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .share-btn:hover {
+            background: #219653;
+        }
+        
+        .info-text {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #2c3e50;
+            border-left: 4px solid #3498db;
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .scenario-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 Калькулятор ESM</h1>
+            <p>Расчет стоимости и ROI системы</p>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">
+                <span>📊 Параметры расчета</span>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">👥 Количество сотрудников</label>
+                <input type="number" id="employees" class="form-input" min="1" value="100">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">🛠️ Сервисные сотрудники</label>
+                <input type="number" id="service_employees" class="form-input" min="1" value="10">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">📨 Обращений в месяц</label>
+                <input type="number" id="monthly_requests" class="form-input" min="1" value="200">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">🏢 Внедрение вендором</label>
+                <select id="vendor_implementation" class="form-select">
+                    <option value="yes">Да (+1.4 млн руб.)</option>
+                    <option value="no">Нет</option>
+                </select>
+            </div>
+            
+            <div class="scenario-buttons">
+                <button class="scenario-btn secondary" onclick="loadScenario(1)">Малый бизнес</button>
+                <button class="scenario-btn secondary" onclick="loadScenario(2)">Средний бизнес</button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">
+                <span>📈 Результаты расчета</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Стоимость лицензий:</span>
+                <span class="result-value" id="license_cost">0 руб.</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Стоимость ПО:</span>
+                <span class="result-value" id="mandatory_software_cost">0 руб.</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Стоимость внедрения:</span>
+                <span class="result-value" id="implementation_cost">0 руб.</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Общая стоимость:</span>
+                <span class="result-value" id="final_project_cost">0 руб.</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Экономия в год:</span>
+                <span class="result-value positive" id="annual_savings">0 руб.</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">ROI за первый год:</span>
+                <span class="result-value positive" id="roi_percentage">0%</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Срок окупаемости:</span>
+                <span class="result-value" id="payback_months">0 мес.</span>
+            </div>
+            
+            <button class="share-btn" onclick="shareResults()">
+                📤 Поделиться результатами
+            </button>
+        </div>
+        
+        <div class="info-text">
+            💡 <strong>Примечание:</strong> Расчеты основаны на типовых показателях эффективности. 
+            Для точного расчета под ваши бизнес-процессы обратитесь к специалисту.
+        </div>
+    </div>
+
+    <script>
+        // Инициализация Telegram Web App
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.enableClosingConfirmation();
+        
+        // Константы из Excel файла
+        const LICENSE_PRICE = 31300;
+        const MANDATORY_SOFTWARE = 184000 + 77000;
+        const IMPLEMENTATION_COST = 1400520;
+        const SAVINGS_PER_REQUEST = 22272;
+        const COST_PER_EMPLOYEE = 6720;
+
+        // Элементы DOM
+        const employeesInput = document.getElementById('employees');
+        const serviceEmployeesInput = document.getElementById('service_employees');
+        const monthlyRequestsInput = document.getElementById('monthly_requests');
+        const vendorImplementationSelect = document.getElementById('vendor_implementation');
+
+        // Функция форматирования чисел
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1).replace('.', ',') + ' млн руб.';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(0) + ' тыс. руб.';
+            }
+            return new Intl.NumberFormat('ru-RU').format(num) + ' руб.';
+        }
+
+        // Основная функция расчета
+        function calculateAll() {
+            try {
+                // Получаем значения из полей ввода
+                const employees = parseInt(employeesInput.value) || 0;
+                const serviceEmployees = parseInt(serviceEmployeesInput.value) || 0;
+                const monthlyRequests = parseInt(monthlyRequestsInput.value) || 0;
+                const vendorImpl = vendorImplementationSelect.value === 'yes';
+                
+                // Расчет стоимости лицензий
+                const licenseCost = LICENSE_PRICE * serviceEmployees;
+                document.getElementById('license_cost').textContent = formatNumber(licenseCost);
+                
+                // Стоимость обязательного ПО
+                document.getElementById('mandatory_software_cost').textContent = formatNumber(MANDATORY_SOFTWARE);
+                
+                // Итого стоимость проекта
+                const totalProjectCost = licenseCost + MANDATORY_SOFTWARE;
+                document.getElementById('total_project_cost').textContent = formatNumber(totalProjectCost);
+                
+                // Стоимость внедрения
+                const implementationCost = vendorImpl ? IMPLEMENTATION_COST : 0;
+                document.getElementById('implementation_cost').textContent = formatNumber(implementationCost);
+                
+                // Общая стоимость проекта
+                const finalCost = totalProjectCost + implementationCost;
+                document.getElementById('final_project_cost').textContent = formatNumber(finalCost);
+                
+                // Экономическая выгода
+                const annualSavings = (SAVINGS_PER_REQUEST * monthlyRequests) - (COST_PER_EMPLOYEE * employees);
+                const annualSavingsElement = document.getElementById('annual_savings');
+                annualSavingsElement.textContent = formatNumber(annualSavings);
+                
+                // ROI (%)
+                let roi = 0;
+                if (finalCost > 0) {
+                    roi = ((annualSavings - finalCost) / finalCost) * 100;
+                }
+                const roiElement = document.getElementById('roi_percentage');
+                roiElement.textContent = roi.toFixed(1) + '%';
+                
+                // Цвет ROI в зависимости от значения
+                if (roi < 0) {
+                    roiElement.className = 'result-value negative';
+                    annualSavingsElement.className = 'result-value negative';
+                } else {
+                    roiElement.className = 'result-value positive';
+                    annualSavingsElement.className = 'result-value positive';
+                }
+                
+                // Срок окупаемости (месяцы)
+                let paybackMonths = 0;
+                if (annualSavings > 0) {
+                    paybackMonths = finalCost / (annualSavings / 12);
+                }
+                document.getElementById('payback_months').textContent = paybackMonths.toFixed(1) + ' мес.';
+                
+            } catch (e) {
+                console.error('Ошибка расчета: ', e);
+            }
+        }
+
+        // Загрузка сценариев
+        function loadScenario(type) {
+            switch(type) {
+                case 1: // Малый бизнес
+                    employeesInput.value = 100;
+                    serviceEmployeesInput.value = 3;
+                    monthlyRequestsInput.value = 30;
+                    vendorImplementationSelect.value = 'yes';
+                    break;
+                case 2: // Средний бизнес
+                    employeesInput.value = 500;
+                    serviceEmployeesInput.value = 10;
+                    monthlyRequestsInput.value = 400;
+                    vendorImplementationSelect.value = 'yes';
+                    break;
+            }
+            calculateAll();
+            
+            // Показать уведомление о загрузке сценария
+            if (tg && tg.showPopup) {
+                tg.showPopup({
+                    title: 'Сценарий загружен',
+                    message: type === 1 ? 'Параметры малого бизнеса установлены' : 'Параметры среднего бизнеса установлены',
+                    buttons: [{ type: 'ok' }]
+                });
+            }
+        }
+
+        // Поделиться результатами
+        function shareResults() {
+            const employees = employeesInput.value;
+            const serviceEmployees = serviceEmployeesInput.value;
+            const monthlyRequests = monthlyRequestsInput.value;
+            const totalCost = document.getElementById('final_project_cost').textContent;
+            const savings = document.getElementById('annual_savings').textContent;
+            const roi = document.getElementById('roi_percentage').textContent;
+            const payback = document.getElementById('payback_months').textContent;
+            
+            const shareText = `💰 Расчет ESM системы:
+
+👥 Сотрудники: ${employees} чел.
+🛠️ Сервисные: ${serviceEmployees} чел.
+📨 Обращений: ${monthlyRequests}/мес
+
+📊 Результаты:
+💵 Стоимость: ${totalCost}
+💸 Экономия: ${savings}/год
+📈 ROI: ${roi}
+⏱️ Окупаемость: ${payback}
+
+Рассчитано в @ESMCalculatorBot`;
+            
+            // Копирование в буфер обмена
+            navigator.clipboard.writeText(shareText).then(() => {
+                if (tg && tg.showPopup) {
+                    tg.showPopup({
+                        title: 'Результаты скопированы',
+                        message: 'Текст расчета скопирован в буфер обмена',
+                        buttons: [{ type: 'ok' }]
+                    });
+                }
+            });
+        }
+
+        // Назначаем обработчики событий
+        employeesInput.addEventListener('input', calculateAll);
+        serviceEmployeesInput.addEventListener('input', calculateAll);
+        monthlyRequestsInput.addEventListener('input', calculateAll);
+        vendorImplementationSelect.addEventListener('change', calculateAll);
+
+        // Первоначальный расчет
+        document.addEventListener('DOMContentLoaded', calculateAll);
+        
+        // Отправка данных в Telegram при закрытии
+        tg.onEvent('viewportChanged', function() {
+            calculateAll();
+        });
+    </script>
+</body>
+</html>

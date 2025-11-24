@@ -1,0 +1,10 @@
+{
+  "app_name": "ESM Calculator",
+  "app_short_name": "ESM Calc",
+  "app_description": "Калькулятор стоимости и ROI системы ESM",
+  "app_photo": {
+    "url": "https://your-domain.com/icon.png"
+  },
+  "app_url": "https://your-domain.com/index.html",
+  "start_param": "start"
+}

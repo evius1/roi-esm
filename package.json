@@ -1,0 +1,14 @@
+{
+  "name": "telegram-esm-calculator",
+  "version": "1.0.0",
+  "description": "Telegram Mini App for ESM calculations",
+  "main": "index.html",
+  "scripts": {
+    "dev": "serve -s .",
+    "build": "echo 'No build process needed'"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "serve": "^14.0.0"
+  }
+}
